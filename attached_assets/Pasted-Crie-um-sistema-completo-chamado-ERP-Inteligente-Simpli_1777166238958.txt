@@ -1,0 +1,187 @@
+Crie um sistema completo chamado ERP Inteligente Simplificado, voltado para pequenas empresas, com foco em controle de estoque, vendas e previsão de demanda usando Inteligência Artificial.
+
+OBJETIVO DO SISTEMA:
+Desenvolver um ERP web moderno onde o usuário possa cadastrar produtos, registrar vendas, visualizar dashboard e receber sugestões automáticas de reposição de estoque com base no histórico de vendas.
+
+TECNOLOGIAS OBRIGATÓRIAS:
+
+FRONTEND:
+- React.js
+- Vite
+- Tailwind CSS
+- Axios
+- React Router DOM
+- Recharts (gráficos)
+
+BACKEND:
+- Python
+- Flask
+- Flask-CORS
+- Flask-SQLAlchemy
+- Flask-JWT-Extended
+- Flask-Migrate
+
+BANCO DE DADOS:
+- SQLite (inicialmente)
+
+INTELIGÊNCIA ARTIFICIAL:
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+
+ARQUITETURA:
+Separar em duas pastas:
+
+/frontend
+/backend
+
+ESTRUTURA BACKEND:
+
+backend/
+ app.py
+ config.py
+ models/
+ routes/
+ services/
+ ml/
+
+ESTRUTURA FRONTEND:
+
+frontend/
+ src/
+   pages/
+   components/
+   services/
+   context/
+
+FUNCIONALIDADES OBRIGATÓRIAS:
+
+1. LOGIN E AUTENTICAÇÃO
+- Tela de login
+- Cadastro de usuário
+- JWT Token
+- Rotas protegidas
+
+2. DASHBOARD PRINCIPAL
+Mostrar cards com:
+- Total de produtos
+- Vendas do dia
+- Produtos com estoque baixo
+- Produto mais vendido
+- Previsão de vendas amanhã
+
+3. PRODUTOS
+CRUD completo:
+- Cadastrar produto
+- Editar produto
+- Excluir produto
+- Listar produtos
+
+Campos:
+- Nome
+- Categoria
+- Preço
+- Estoque atual
+- Estoque mínimo
+
+4. VENDAS
+Tela para registrar vendas:
+- Produto
+- Quantidade
+- Data
+
+Listar histórico de vendas.
+
+5. PREVISÃO DE DEMANDA (IA)
+Criar módulo que analisa vendas anteriores e prevê demanda futura.
+
+Use inicialmente:
+- Média móvel dos últimos 7 dias
+OU
+- Regressão Linear com Scikit-learn
+
+Mostrar na tela:
+
+Exemplo:
+Produto: Pão Francês
+Previsão amanhã: 120 unidades
+Sugestão de compra: +40 unidades
+
+6. ALERTAS INTELIGENTES
+Mostrar mensagens como:
+- Estoque crítico
+- Alta demanda prevista amanhã
+- Produto parado sem vendas
+
+7. GRÁFICOS
+Usar Recharts:
+
+- Vendas por semana
+- Produtos mais vendidos
+- Evolução de estoque
+
+DESIGN:
+- Interface moderna
+- Responsiva
+- Dashboard profissional
+- Sidebar lateral
+- Navbar superior
+- Cards elegantes
+- Tema claro profissional
+
+API BACKEND:
+
+POST /register
+POST /login
+
+GET /products
+POST /products
+PUT /products/:id
+DELETE /products/:id
+
+GET /sales
+POST /sales
+
+GET /dashboard
+
+GET /forecast/:product_id
+GET /forecast-all
+
+BANCO DE DADOS:
+
+Tabela users:
+id
+name
+email
+password_hash
+
+Tabela products:
+id
+name
+category
+price
+current_stock
+minimum_stock
+
+Tabela sales:
+id
+product_id
+quantity
+sale_date
+
+Tabela forecasts:
+id
+product_id
+predicted_quantity
+forecast_date
+
+EXTRAS IMPORTANTES:
+- Código limpo
+- Separação em componentes
+- Comentários explicativos
+- Backend organizado em rotas e services
+- Frontend profissional
+- Sistema pronto para rodar
+
+QUERO QUE VOCÊ GERE TODO O CÓDIGO INICIAL DO PROJETO COMPLETO, COM FRONTEND E BACKEND FUNCIONANDO.
