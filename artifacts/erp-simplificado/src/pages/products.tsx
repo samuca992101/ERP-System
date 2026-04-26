@@ -55,11 +55,11 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const productSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  category: z.string().min(2, "Category is required"),
-  price: z.coerce.number().min(0, "Price must be positive"),
-  currentStock: z.coerce.number().int().min(0, "Stock cannot be negative"),
-  minimumStock: z.coerce.number().int().min(0, "Minimum stock cannot be negative"),
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  category: z.string().min(2, "Categoria é obrigatória"),
+  price: z.coerce.number().min(0, "Preço deve ser positivo"),
+  currentStock: z.coerce.number().int().min(0, "Estoque não pode ser negativo"),
+  minimumStock: z.coerce.number().int().min(0, "Estoque mínimo não pode ser negativo"),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -80,9 +80,9 @@ export default function Products() {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() });
         setIsCreateOpen(false);
-        toast({ title: "Product created successfully" });
+        toast({ title: "Produto criado com sucesso" });
       },
-      onError: (err) => toast({ title: "Failed to create product", description: err.message, variant: "destructive" })
+      onError: (err) => toast({ title: "Erro ao criar produto", description: err.message, variant: "destructive" })
     }
   });
 
@@ -92,9 +92,9 @@ export default function Products() {
         queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() });
         setIsEditOpen(false);
         setEditProduct(null);
-        toast({ title: "Product updated successfully" });
+        toast({ title: "Produto atualizado com sucesso" });
       },
-      onError: (err) => toast({ title: "Failed to update product", description: err.message, variant: "destructive" })
+      onError: (err) => toast({ title: "Erro ao atualizar produto", description: err.message, variant: "destructive" })
     }
   });
 
@@ -102,9 +102,9 @@ export default function Products() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() });
-        toast({ title: "Product deleted successfully" });
+        toast({ title: "Produto excluído com sucesso" });
       },
-      onError: (err) => toast({ title: "Failed to delete product", description: err.message, variant: "destructive" })
+      onError: (err) => toast({ title: "Erro ao excluir produto", description: err.message, variant: "destructive" })
     }
   });
 
@@ -135,52 +135,52 @@ export default function Products() {
   };
 
   const getStockBadge = (current: number, min: number) => {
-    if (current === 0) return <Badge variant="destructive">Out of Stock</Badge>;
-    if (current <= min) return <Badge variant="warning" className="bg-orange-500 hover:bg-orange-600 text-white">Low Stock</Badge>;
-    return <Badge variant="default" className="bg-emerald-500 hover:bg-emerald-600">In Stock</Badge>;
+    if (current === 0) return <Badge variant="destructive">Sem Estoque</Badge>;
+    if (current <= min) return <Badge className="bg-orange-500 hover:bg-orange-600 text-white">Estoque Baixo</Badge>;
+    return <Badge className="bg-emerald-500 hover:bg-emerald-600">Em Estoque</Badge>;
   };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Products</h2>
-          <p className="text-muted-foreground">Manage your catalog and inventory.</p>
+          <h2 className="text-3xl font-bold tracking-tight">Produtos</h2>
+          <p className="text-muted-foreground">Gerencie seu catálogo e estoque.</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={(open) => {
           setIsCreateOpen(open);
           if (open) createForm.reset();
         }}>
           <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" /> Add Product</Button>
+            <Button><Plus className="mr-2 h-4 w-4" /> Adicionar Produto</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
-              <DialogDescription>Add a new item to your catalog.</DialogDescription>
+              <DialogTitle>Novo Produto</DialogTitle>
+              <DialogDescription>Adicione um novo item ao catálogo.</DialogDescription>
             </DialogHeader>
             <Form {...createForm}>
               <form onSubmit={createForm.handleSubmit((data) => createProduct({ data }))} className="space-y-4">
                 <FormField control={createForm.control} name="name" render={({ field }) => (
-                  <FormItem><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Nome</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={createForm.control} name="category" render={({ field }) => (
-                  <FormItem><FormLabel>Category</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Categoria</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={createForm.control} name="price" render={({ field }) => (
-                    <FormItem><FormLabel>Price ($)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Preço (R$)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
                   )} />
                   <FormField control={createForm.control} name="currentStock" render={({ field }) => (
-                    <FormItem><FormLabel>Current Stock</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Estoque Atual</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
                   )} />
                 </div>
                 <FormField control={createForm.control} name="minimumStock" render={({ field }) => (
-                  <FormItem><FormLabel>Minimum Stock Alert</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Estoque Mínimo</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <DialogFooter>
                   <Button type="submit" disabled={isCreating}>
-                    {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Save
+                    {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Salvar
                   </Button>
                 </DialogFooter>
               </form>
@@ -189,35 +189,35 @@ export default function Products() {
         </Dialog>
       </div>
 
-      {/* Edit Dialog */}
+      {/* Diálogo de Edição */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
-            <DialogDescription>Update product details.</DialogDescription>
+            <DialogTitle>Editar Produto</DialogTitle>
+            <DialogDescription>Atualize os detalhes do produto.</DialogDescription>
           </DialogHeader>
           <Form {...editForm}>
             <form onSubmit={editForm.handleSubmit((data) => updateProduct({ id: editProduct.id, data }))} className="space-y-4">
               <FormField control={editForm.control} name="name" render={({ field }) => (
-                <FormItem><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Nome</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
               )} />
               <FormField control={editForm.control} name="category" render={({ field }) => (
-                <FormItem><FormLabel>Category</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Categoria</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
               )} />
               <div className="grid grid-cols-2 gap-4">
                 <FormField control={editForm.control} name="price" render={({ field }) => (
-                  <FormItem><FormLabel>Price ($)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Preço (R$)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={editForm.control} name="currentStock" render={({ field }) => (
-                  <FormItem><FormLabel>Current Stock</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Estoque Atual</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
               </div>
               <FormField control={editForm.control} name="minimumStock" render={({ field }) => (
-                <FormItem><FormLabel>Minimum Stock Alert</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Estoque Mínimo</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
               )} />
               <DialogFooter>
                 <Button type="submit" disabled={isUpdating}>
-                  {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Update
+                  {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Atualizar
                 </Button>
               </DialogFooter>
             </form>
@@ -229,7 +229,7 @@ export default function Products() {
         <Search className="h-4 w-4 text-muted-foreground" />
         <input 
           className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground text-sm"
-          placeholder="Search products..."
+          placeholder="Buscar produtos..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -239,12 +239,12 @@ export default function Products() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">Stock</TableHead>
+              <TableHead>Nome</TableHead>
+              <TableHead>Categoria</TableHead>
+              <TableHead className="text-right">Preço</TableHead>
+              <TableHead className="text-right">Estoque</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -262,7 +262,7 @@ export default function Products() {
             ) : filteredProducts.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                  No products found.
+                  Nenhum produto encontrado.
                 </TableCell>
               </TableRow>
             ) : (
@@ -270,7 +270,7 @@ export default function Products() {
                 <TableRow key={product.id}>
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>{product.category}</TableCell>
-                  <TableCell className="text-right">${product.price.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">R$ {product.price.toFixed(2)}</TableCell>
                   <TableCell className="text-right">{product.currentStock}</TableCell>
                   <TableCell>{getStockBadge(product.currentStock, product.minimumStock)}</TableCell>
                   <TableCell className="text-right">
@@ -286,15 +286,15 @@ export default function Products() {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                            <AlertDialogTitle>Excluir Produto</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete {product.name}? This action cannot be undone.
+                              Tem certeza que deseja excluir {product.name}? Esta ação não pode ser desfeita.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
                             <AlertDialogAction onClick={() => deleteProduct({ id: product.id })} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                              Delete
+                              Excluir
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

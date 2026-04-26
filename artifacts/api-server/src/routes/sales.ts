@@ -43,12 +43,12 @@ router.post("/sales", requireAuth, async (req, res): Promise<void> => {
 
   const [product] = await db.select().from(productsTable).where(eq(productsTable.id, productId));
   if (!product) {
-    res.status(400).json({ error: "Product not found" });
+    res.status(400).json({ error: "Produto não encontrado" });
     return;
   }
 
   if (product.currentStock < quantity) {
-    res.status(400).json({ error: `Insufficient stock. Available: ${product.currentStock}` });
+    res.status(400).json({ error: `Estoque insuficiente. Disponível: ${product.currentStock} unidades` });
     return;
   }
 

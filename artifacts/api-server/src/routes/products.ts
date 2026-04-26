@@ -58,7 +58,7 @@ router.get("/products/:id", requireAuth, async (req, res): Promise<void> => {
 
   const [product] = await db.select().from(productsTable).where(eq(productsTable.id, params.data.id));
   if (!product) {
-    res.status(404).json({ error: "Product not found" });
+    res.status(404).json({ error: "Produto não encontrado" });
     return;
   }
 
@@ -86,7 +86,7 @@ router.put("/products/:id", requireAuth, async (req, res): Promise<void> => {
     .returning();
 
   if (!product) {
-    res.status(404).json({ error: "Product not found" });
+    res.status(404).json({ error: "Produto não encontrado" });
     return;
   }
 
@@ -102,7 +102,7 @@ router.delete("/products/:id", requireAuth, async (req, res): Promise<void> => {
 
   const [product] = await db.delete(productsTable).where(eq(productsTable.id, params.data.id)).returning();
   if (!product) {
-    res.status(404).json({ error: "Product not found" });
+    res.status(404).json({ error: "Produto não encontrado" });
     return;
   }
 

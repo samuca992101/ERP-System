@@ -18,7 +18,7 @@ router.get("/alerts", requireAuth, async (_req, res): Promise<void> => {
         type: "critical_stock",
         productId: product.id,
         productName: product.name,
-        message: `${product.name} is completely out of stock!`,
+        message: `${product.name} está completamente sem estoque!`,
         severity: "critical",
       });
     } else if (product.currentStock <= product.minimumStock) {
@@ -27,7 +27,7 @@ router.get("/alerts", requireAuth, async (_req, res): Promise<void> => {
         type: "restock_needed",
         productId: product.id,
         productName: product.name,
-        message: `${product.name} has low stock: ${product.currentStock} units (minimum: ${product.minimumStock})`,
+        message: `${product.name} está com estoque baixo: ${product.currentStock} unidades (mínimo: ${product.minimumStock})`,
         severity: product.currentStock <= product.minimumStock / 2 ? "high" : "medium",
       });
     }
@@ -48,7 +48,7 @@ router.get("/alerts", requireAuth, async (_req, res): Promise<void> => {
         type: "idle_product",
         productId: product.id,
         productName: product.name,
-        message: `${product.name} has had no sales in the last 14 days`,
+        message: `${product.name} não teve nenhuma venda nos últimos 14 dias`,
         severity: "low",
       });
     }
@@ -76,7 +76,7 @@ router.get("/alerts", requireAuth, async (_req, res): Promise<void> => {
         type: "high_demand",
         productId: product.id,
         productName: product.name,
-        message: `${product.name} has unusually high demand in the last 3 days`,
+        message: `${product.name} está com demanda incomum nos últimos 3 dias`,
         severity: "medium",
       });
     }

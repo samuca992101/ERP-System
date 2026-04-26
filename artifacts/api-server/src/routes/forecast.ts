@@ -87,7 +87,7 @@ router.get("/forecast/:productId", requireAuth, async (req, res): Promise<void> 
 
   const [product] = await db.select().from(productsTable).where(eq(productsTable.id, params.data.productId));
   if (!product) {
-    res.status(404).json({ error: "Product not found" });
+    res.status(404).json({ error: "Produto não encontrado" });
     return;
   }
 

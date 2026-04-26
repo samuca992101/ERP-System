@@ -3,6 +3,20 @@ import { AlertCircle, AlertTriangle, Bell, CheckCircle2, TrendingUp, PackageX } 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
+const TIPO_ALERTA: Record<string, string> = {
+  critical_stock: "Estoque Crítico",
+  high_demand: "Alta Demanda",
+  idle_product: "Produto Parado",
+  restock_needed: "Reposição Necessária",
+};
+
+const SEVERIDADE_PT: Record<string, string> = {
+  critical: "Crítico",
+  high: "Alto",
+  medium: "Médio",
+  low: "Baixo",
+};
+
 export default function Alerts() {
   const { data: alerts, isLoading } = useGetAlerts({ query: { queryKey: getGetAlertsQueryKey() } });
 
@@ -27,15 +41,11 @@ export default function Alerts() {
     }
   };
 
-  const formatType = (type: string) => {
-    return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  };
-
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Smart Alerts</h2>
-        <p className="text-muted-foreground">Automated insights requiring your attention.</p>
+        <h2 className="text-3xl font-bold tracking-tight">Alertas Inteligentes</h2>
+        <p className="text-muted-foreground">Alertas automáticos que precisam da sua atenção.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -55,8 +65,10 @@ export default function Alerts() {
           <Card className="col-span-full border-dashed bg-muted/30">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
               <CheckCircle2 className="h-12 w-12 text-emerald-500 mb-4 opacity-80" />
-              <CardTitle className="mb-2">All Clear!</CardTitle>
-              <CardDescription>Your inventory and sales metrics are looking good. No alerts to display.</CardDescription>
+              <CardTitle className="mb-2">Tudo em Ordem!</CardTitle>
+              <CardDescription>
+                Seu estoque e vendas estão em ordem. Nenhum alerta para exibir.
+              </CardDescription>
             </CardContent>
           </Card>
         ) : (
@@ -68,9 +80,11 @@ export default function Alerts() {
                 </div>
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold uppercase tracking-wider">{formatType(alert.type)}</p>
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-background/50 capitalize shadow-sm">
-                      {alert.severity}
+                    <p className="text-sm font-semibold uppercase tracking-wider">
+                      {TIPO_ALERTA[alert.type] ?? alert.type}
+                    </p>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-background/50 shadow-sm">
+                      {SEVERIDADE_PT[alert.severity] ?? alert.severity}
                     </span>
                   </div>
                   <h4 className="font-medium text-base text-foreground">{alert.productName}</h4>

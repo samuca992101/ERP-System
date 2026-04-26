@@ -19,9 +19,9 @@ import {
 import { Input } from "@/components/ui/input";
 
 const registerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("E-mail inválido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -48,8 +48,8 @@ export default function Register() {
       },
       onError: (error) => {
         toast({
-          title: "Registration failed",
-          description: error.data?.error || "An error occurred during registration.",
+          title: "Falha no cadastro",
+          description: error.data?.error || "Ocorreu um erro durante o cadastro.",
           variant: "destructive",
         });
       },
@@ -67,9 +67,9 @@ export default function Register() {
           <div className="h-12 w-12 bg-primary/10 text-primary flex items-center justify-center rounded-xl mb-2">
             <TrendingUp className="h-6 w-6" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Criar conta</h1>
           <p className="text-sm text-muted-foreground">
-            Get started with Inteligente ERP
+            Comece a usar o ERP Inteligente Simplificado
           </p>
         </div>
 
@@ -80,9 +80,9 @@ export default function Register() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>Nome Completo</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder="João Silva" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,9 +93,9 @@ export default function Register() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>E-mail</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
+                    <Input placeholder="nome@exemplo.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -106,7 +106,7 @@ export default function Register() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Senha</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -118,19 +118,19 @@ export default function Register() {
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
+                  Criando conta...
                 </>
               ) : (
-                "Create Account"
+                "Criar Conta"
               )}
             </Button>
           </form>
         </Form>
 
         <div className="text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
+          Já tem uma conta?{" "}
           <Link href="/login" className="font-semibold text-primary hover:underline">
-            Sign in
+            Entrar
           </Link>
         </div>
       </div>

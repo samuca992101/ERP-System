@@ -20,8 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().email("E-mail inválido"),
+  password: z.string().min(1, "Senha é obrigatória"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -47,8 +47,8 @@ export default function Login() {
       },
       onError: (error) => {
         toast({
-          title: "Login failed",
-          description: error.data?.error || "Invalid credentials. Please try again.",
+          title: "Falha ao entrar",
+          description: error.data?.error || "Credenciais inválidas. Tente novamente.",
           variant: "destructive",
         });
       },
@@ -66,9 +66,9 @@ export default function Login() {
           <div className="h-12 w-12 bg-primary/10 text-primary flex items-center justify-center rounded-xl mb-2">
             <TrendingUp className="h-6 w-6" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Bem-vindo de volta</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your credentials to access your ERP
+            Digite suas credenciais para acessar o ERP
           </p>
         </div>
 
@@ -79,9 +79,9 @@ export default function Login() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>E-mail</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
+                    <Input placeholder="nome@exemplo.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,7 +92,7 @@ export default function Login() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Senha</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -104,19 +104,19 @@ export default function Login() {
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  Entrando...
                 </>
               ) : (
-                "Sign In"
+                "Entrar"
               )}
             </Button>
           </form>
         </Form>
 
         <div className="text-center text-sm text-muted-foreground">
-          Don't have an account?{" "}
+          Não tem uma conta?{" "}
           <Link href="/register" className="font-semibold text-primary hover:underline">
-            Register here
+            Cadastre-se
           </Link>
         </div>
       </div>

@@ -19,10 +19,10 @@ import {
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/products", label: "Products", icon: Package },
-  { href: "/sales", label: "Sales", icon: ShoppingCart },
-  { href: "/forecast", label: "AI Forecast", icon: TrendingUp },
-  { href: "/alerts", label: "Smart Alerts", icon: Bell },
+  { href: "/products", label: "Produtos", icon: Package },
+  { href: "/sales", label: "Vendas", icon: ShoppingCart },
+  { href: "/forecast", label: "Previsão IA", icon: TrendingUp },
+  { href: "/alerts", label: "Alertas", icon: Bell },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -34,7 +34,7 @@ export function Layout({ children }: { children: ReactNode }) {
       <div className="flex h-14 items-center border-b px-6">
         <div className="flex items-center gap-2 font-bold text-lg text-primary">
           <TrendingUp className="h-6 w-6" />
-          <span>Inteligente ERP</span>
+          <span>ERP Inteligente</span>
         </div>
       </div>
       <div className="flex-1 overflow-auto py-4">
@@ -70,7 +70,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
           <Button variant="ghost" size="icon" onClick={logout} className="h-8 w-8 text-muted-foreground hover:text-destructive">
             <LogOut className="h-4 w-4" />
-            <span className="sr-only">Logout</span>
+            <span className="sr-only">Sair</span>
           </Button>
         </div>
       </div>
@@ -79,7 +79,6 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full bg-muted/30">
-      {/* Desktop Sidebar */}
       <aside className="hidden border-r bg-background w-64 lg:block flex-shrink-0">
         <SidebarContent />
       </aside>
@@ -90,14 +89,14 @@ export function Layout({ children }: { children: ReactNode }) {
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="lg:hidden">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle navigation menu</span>
+                <span className="sr-only">Abrir menu de navegação</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0">
               <SidebarContent />
             </SheetContent>
           </Sheet>
-          <div className="font-bold text-lg text-primary">Inteligente ERP</div>
+          <div className="font-bold text-lg text-primary">ERP Inteligente</div>
         </header>
 
         <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">

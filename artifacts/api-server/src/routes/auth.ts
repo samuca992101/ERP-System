@@ -18,7 +18,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
 
   const existing = await db.select().from(usersTable).where(eq(usersTable.email, email));
   if (existing.length > 0) {
-    res.status(400).json({ error: "Email already registered" });
+    res.status(400).json({ error: "E-mail já cadastrado" });
     return;
   }
 
@@ -45,13 +45,13 @@ router.post("/auth/login", async (req, res): Promise<void> => {
 
   const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
   if (!user) {
-    res.status(401).json({ error: "Invalid credentials" });
+    res.status(401).json({ error: "Credenciais inválidas" });
     return;
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
-    res.status(401).json({ error: "Invalid credentials" });
+    res.status(401).json({ error: "Credenciais inválidas" });
     return;
   }
 
@@ -67,7 +67,7 @@ router.post("/auth/login", async (req, res): Promise<void> => {
 router.get("/auth/me", requireAuth, async (req: AuthRequest, res): Promise<void> => {
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, req.userId!));
   if (!user) {
-    res.status(401).json({ error: "User not found" });
+    res.status(401).json({ error: "Usuário não encontrado" });
     return;
   }
 
