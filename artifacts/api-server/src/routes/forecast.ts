@@ -1,27 +1,47 @@
 import { Router, type IRouter } from "express";
-import { db, salesTable, productsTable } from "@workspace/db";
+import { db } from "../db"; 
 import { eq, gte } from "drizzle-orm";
 import { subDays } from "date-fns";
 import { requireAuth } from "../middlewares/auth";
-import { GetForecastParams } from "@workspace/api-zod";
+import { z } from "zod";
+
+// 1. IMPORTAÇÃO DAS TABELAS (O que estava faltando)
+// Certifique-se que os nomes 'products' e 'inventoryMovements' batem com o seu schema.ts
+import { products as productsTable, inventoryMovements as salesTable } from "../db/schema";
 
 const router: IRouter = Router();
+
+// Validador local para substituir o GetForecastParams do workspace
+const GetForecastParams = z.object({
+  productId: z.string().transform(Number)
+});
 
 async function computeForecast(product: typeof productsTable.$inferSelect) {
   const thirtyDaysAgo = subDays(new Date(), 30);
 
   const sales = await db
-    .select({ quantity: salesTable.quantity, saleDate: salesTable.saleDate })
+    .select({ 
+        quantity: salesTable.quantity, 
+        // Se no seu schema você usou createdAt, mude aqui para createdAt
+        saleDate: salesTable.createdAt 
+    })
     .from(salesTable)
     .where(eq(salesTable.productId, product.id));
 
-  const recentSales = sales.filter((s) => s.saleDate >= thirtyDaysAgo);
+  // Converte a string de data do SQLite para objeto Date se necessário
+  const recentSales = sales.filter((s) => new Date(s.saleDate) >= thirtyDaysAgo);
 
-  // Group by day
-  const dailyMap: Record<string, number> = {};
+ const dailyMap: Record<string, number> = {};
+  
   for (const sale of recentSales) {
-    const key = sale.saleDate.toISOString().split("T")[0];
-    dailyMap[key] = (dailyMap[key] || 0) + sale.quantity;
+    // 1. Filtra apenas quantidades menores que 0 (saídas/vendas)
+    // Isso evita que entradas de estoque (compras) sujem o cálculo da demanda
+    if (sale.quantity < 0) {
+      const key = new Date(sale.saleDate).toISOString().split("T")[0];
+      
+      // 2. Math.abs() converte o -10 do banco em uma demanda positiva de 10
+      dailyMap[key] = (dailyMap[key] || 0) + Math.abs(sale.quantity);
+    }
   }
 
   const dailyValues = Object.values(dailyMap);
@@ -32,18 +52,16 @@ async function computeForecast(product: typeof productsTable.$inferSelect) {
       productName: product.name,
       forecastQuantity: 0,
       currentStock: product.currentStock,
-      minimumStock: product.minimumStock,
-      suggestedPurchase: Math.max(0, product.minimumStock - product.currentStock),
+      minimumStock: product.minStock, // Ajustado para bater com o seu schema (minStock)
+      suggestedPurchase: Math.max(0, (product.minStock || 0) - (product.currentStock || 0)),
       confidence: 0,
       trend: "stable",
     };
   }
 
-  // Moving average of last 7 days
   const last7 = dailyValues.slice(-7);
   const avg7 = last7.reduce((s, v) => s + v, 0) / last7.length;
 
-  // Simple linear trend: compare first half vs second half
   const half = Math.floor(dailyValues.length / 2);
   let trend: "up" | "down" | "stable" = "stable";
   if (half > 0) {
@@ -54,28 +72,28 @@ async function computeForecast(product: typeof productsTable.$inferSelect) {
   }
 
   const forecastQuantity = Math.round(avg7);
-  const neededStock = product.currentStock - forecastQuantity;
-  const suggestedPurchase = Math.max(0, -neededStock + product.minimumStock);
-
-  // Confidence: based on sample size
-  const confidence = Math.min(95, Math.round(60 + dailyValues.length * 1.5));
+  const suggestedPurchase = Math.max(0, (product.minStock || 0) - (product.currentStock || 0) + forecastQuantity);
 
   return {
     productId: product.id,
     productName: product.name,
     forecastQuantity,
     currentStock: product.currentStock,
-    minimumStock: product.minimumStock,
+    minimumStock: product.minStock,
     suggestedPurchase,
-    confidence,
+    confidence: Math.min(95, Math.round(60 + dailyValues.length * 1.5)),
     trend,
   };
 }
 
 router.get("/forecast", requireAuth, async (_req, res): Promise<void> => {
-  const products = await db.select().from(productsTable);
-  const forecasts = await Promise.all(products.map(computeForecast));
-  res.json(forecasts);
+  try {
+    const products = await db.select().from(productsTable);
+    const forecasts = await Promise.all(products.map(computeForecast));
+    res.json(forecasts);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao processar previsão" });
+  }
 });
 
 router.get("/forecast/:productId", requireAuth, async (req, res): Promise<void> => {

@@ -1,25 +1,14 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 
-const rawPort = process.env["PORT"];
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
-
-const port = Number(rawPort);
+// Tenta pegar a porta do ambiente ou usa 3000 por padrão
+const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
+  throw new Error(`Invalid PORT value: "${process.env.PORT}"`);
 }
 
-app.listen(port, (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
-    process.exit(1);
-  }
-
+// O Express no Windows às vezes precisa do host '0.0.0.0' para evitar bloqueios
+app.listen(port, "0.0.0.0", () => {
   logger.info({ port }, "Server listening");
 });

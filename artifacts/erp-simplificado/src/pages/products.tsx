@@ -10,13 +10,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, PackagePlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -69,6 +70,12 @@ export default function Products() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<any>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  
+  // Estados para o Modal de Reposição de Estoque
+  const [stockInProduct, setStockInProduct] = useState<any>(null);
+  const [isStockInOpen, setIsStockInOpen] = useState(false);
+  const [stockInQuantity, setStockInQuantity] = useState(1);
+  const [isSubmittingStock, setIsSubmittingStock] = useState(false);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -108,6 +115,41 @@ export default function Products() {
     }
   });
 
+  // Função para processar a Entrada de Estoque
+  const handleStockIn = async () => {
+    if (!stockInProduct || stockInQuantity <= 0) return;
+    
+    setIsSubmittingStock(true);
+    try {
+      const response = await fetch("/api/inventory/in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          productId: stockInProduct.id, 
+          quantity: stockInQuantity 
+        }),
+      });
+
+      if (!response.ok) throw new Error();
+
+      queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() });
+      toast({ 
+        title: "Estoque atualizado", 
+        description: `${stockInQuantity} unidades adicionadas a ${stockInProduct.name}.` 
+      });
+      setIsStockInOpen(false);
+      setStockInQuantity(1);
+    } catch (error) {
+      toast({ 
+        variant: "destructive", 
+        title: "Erro na reposição", 
+        description: "Não foi possível atualizar o estoque." 
+      });
+    } finally {
+      setIsSubmittingStock(false);
+    }
+  };
+
   const filteredProducts = products?.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -134,10 +176,16 @@ export default function Products() {
     setIsEditOpen(true);
   };
 
+  const handleStockInClick = (product: any) => {
+    setStockInProduct(product);
+    setStockInQuantity(1);
+    setIsStockInOpen(true);
+  };
+
   const getStockBadge = (current: number, min: number) => {
     if (current === 0) return <Badge variant="destructive">Sem Estoque</Badge>;
     if (current <= min) return <Badge className="bg-orange-500 hover:bg-orange-600 text-white">Estoque Baixo</Badge>;
-    return <Badge className="bg-emerald-500 hover:bg-emerald-600">Em Estoque</Badge>;
+    return <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white">Em Estoque</Badge>;
   };
 
   return (
@@ -188,6 +236,36 @@ export default function Products() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Modal de Reposição de Estoque */}
+      <Dialog open={isStockInOpen} onOpenChange={setIsStockInOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Repor Estoque</DialogTitle>
+            <DialogDescription>
+              Adicionar unidades ao produto: <span className="font-bold text-foreground">{stockInProduct?.name}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="qty">Quantidade a adicionar</Label>
+              <Input 
+                id="qty" 
+                type="number" 
+                min="1" 
+                value={stockInQuantity} 
+                onChange={(e) => setStockInQuantity(Number(e.target.value))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsStockInOpen(false)}>Cancelar</Button>
+            <Button onClick={handleStockIn} disabled={isSubmittingStock}>
+              {isSubmittingStock && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Confirmar Entrada
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Diálogo de Edição */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
@@ -275,9 +353,21 @@ export default function Products() {
                   <TableCell>{getStockBadge(product.currentStock, product.minimumStock)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
+                      {/* Botão de Reposição de Estoque */}
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={() => handleStockInClick(product)}
+                        className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                        title="Repor Estoque"
+                      >
+                        <PackagePlus className="h-4 w-4" />
+                      </Button>
+
                       <Button variant="outline" size="icon" onClick={() => handleEditClick(product)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
+                      
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="outline" size="icon" className="text-destructive hover:bg-destructive/10">

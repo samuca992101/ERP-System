@@ -1,56 +1,76 @@
 import { Router, type IRouter } from "express";
-import { db, productsTable } from "@workspace/db";
+import { db } from "../db"; 
 import { eq } from "drizzle-orm";
-import {
-  CreateProductBody,
-  GetProductParams,
-  GetProductResponse,
-  UpdateProductParams,
-  UpdateProductBody,
-  UpdateProductResponse,
-  DeleteProductParams,
-  DeleteProductResponse,
-  ListProductsResponse,
-} from "@workspace/api-zod";
+import { z } from "zod";
 import { requireAuth } from "../middlewares/auth";
+
+// 1. IMPORTAÇÃO LOCAL DO SCHEMA
+import { products as productsTable } from "../db/schema";
 
 const router: IRouter = Router();
 
+// 2. SCHEMAS DE VALIDAÇÃO LOCAIS (Substituindo o @workspace/api-zod)
+const ProductSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  price: z.number().positive(),
+  currentStock: z.number().default(0),
+  minStock: z.number().default(5),
+});
+
+const ProductParams = z.object({
+  id: z.string().transform(Number),
+});
+
+// Helper para formatar a resposta
 function mapProduct(p: typeof productsTable.$inferSelect) {
   return {
     id: p.id,
     name: p.name,
-    category: p.category,
+    description: p.description,
     price: Number(p.price),
     currentStock: p.currentStock,
-    minimumStock: p.minimumStock,
-    createdAt: p.createdAt.toISOString(),
+    minimumStock: p.minStock, // Mapeado para o nome que o frontend espera
   };
 }
 
+// GET: Listar Produtos
 router.get("/products", requireAuth, async (_req, res): Promise<void> => {
-  const products = await db.select().from(productsTable).orderBy(productsTable.name);
-  res.json(ListProductsResponse.parse(products.map(mapProduct)));
+  try {
+    const products = await db.select().from(productsTable).orderBy(productsTable.name);
+    res.json(products.map(mapProduct));
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar produtos" });
+  }
 });
 
+// POST: Criar Produto
 router.post("/products", requireAuth, async (req, res): Promise<void> => {
-  const parsed = CreateProductBody.safeParse(req.body);
+  const parsed = ProductSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
 
-  const { name, category, price, currentStock, minimumStock } = parsed.data;
+  const { name, description, price, currentStock, minStock } = parsed.data;
+  
   const [product] = await db
     .insert(productsTable)
-    .values({ name, category, price: String(price), currentStock, minimumStock })
+    .values({ 
+      name, 
+      description, 
+      price, 
+      currentStock, 
+      minStock 
+    })
     .returning();
 
-  res.status(201).json(GetProductResponse.parse(mapProduct(product)));
+  res.status(201).json(mapProduct(product));
 });
 
+// GET: Produto por ID
 router.get("/products/:id", requireAuth, async (req, res): Promise<void> => {
-  const params = GetProductParams.safeParse(req.params);
+  const params = ProductParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
@@ -62,26 +82,28 @@ router.get("/products/:id", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  res.json(GetProductResponse.parse(mapProduct(product)));
+  res.json(mapProduct(product));
 });
 
+// PUT: Atualizar Produto
 router.put("/products/:id", requireAuth, async (req, res): Promise<void> => {
-  const params = UpdateProductParams.safeParse(req.params);
+  const params = ProductParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
   }
 
-  const parsed = UpdateProductBody.safeParse(req.body);
+  const parsed = ProductSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
 
-  const { name, category, price, currentStock, minimumStock } = parsed.data;
+  const { name, description, price, currentStock, minStock } = parsed.data;
+  
   const [product] = await db
     .update(productsTable)
-    .set({ name, category, price: String(price), currentStock, minimumStock })
+    .set({ name, description, price, currentStock, minStock })
     .where(eq(productsTable.id, params.data.id))
     .returning();
 
@@ -90,23 +112,25 @@ router.put("/products/:id", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  res.json(UpdateProductResponse.parse(mapProduct(product)));
+  res.json(mapProduct(product));
 });
 
+// DELETE: Remover Produto
 router.delete("/products/:id", requireAuth, async (req, res): Promise<void> => {
-  const params = DeleteProductParams.safeParse(req.params);
+  const params = ProductParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
   }
 
   const [product] = await db.delete(productsTable).where(eq(productsTable.id, params.data.id)).returning();
+  
   if (!product) {
     res.status(404).json({ error: "Produto não encontrado" });
     return;
   }
 
-  res.json(DeleteProductResponse.parse({ success: true }));
+  res.json({ success: true });
 });
 
 export default router;
