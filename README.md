@@ -21,7 +21,7 @@ O sistema é dividido em módulos integrados para cobrir as principais áreas de
 
 ## 🛠️ Tecnologias Utilizadas
 
-> *Nota: Personalize esta seção com a stack real do projeto (ex: Java, Node.js, React, PostgreSQL).*
+> TypeScript/React
 
 - **Backend:** 
 - **Frontend:** 
