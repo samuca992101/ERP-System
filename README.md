@@ -23,10 +23,9 @@ O sistema é dividido em módulos integrados para cobrir as principais áreas de
 
 > TypeScript/React
 
-- **Backend:** 
-- **Frontend:** 
-- **Banco de Dados:** 
-- **DevOps & Hospedagem:** 
+- **Backend:** Node 
+- **Frontend:** React
+- **Banco de Dados:** PostgreSQL
 
 ---
 
